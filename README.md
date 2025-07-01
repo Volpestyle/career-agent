@@ -1,36 +1,81 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Career Agent
 
-## Getting Started
+An automated job searching platform built with Next.js that uses browser automation to find and apply to jobs across multiple platforms.
 
-First, run the development server:
+## Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **Multi-platform Job Search**: Automated searching across job boards
+- **Real-time Browser Streaming**: Watch job searches happen in real-time
+- **Job Management**: Save, track, and manage job applications
+- **Automated Applications**: Apply to jobs automatically or manually
+- **Session Management**: Start, pause, resume, and stop job searches
+- **Real-time Updates**: Live job extraction and status updates
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Tech Stack
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Frontend**: Next.js 15, TypeScript, Tailwind CSS, shadcn/ui
+- **Backend**: Next.js API Routes
+- **Browser Automation**: Stagehand (wallcrawler package)
+- **Real-time**: Server-Sent Events with Redis pub/sub
+- **Database**: Redis (for SSE connections), In-memory storage (demo)
+- **Cloud**: AWS provider for browser instances
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Quick Start
 
-## Learn More
+1. **Clone and install dependencies**
+   ```bash
+   git clone https://github.com/Volpestyle/career-agent.git
+   cd career-agent
+   npm install
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+2. **Set up Redis**
+   ```bash
+   # Using Docker (recommended)
+   docker run -p 6379:6379 -d redis:latest
+   
+   # Or install locally (macOS)
+   brew install redis
+   redis-server
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+3. **Configure environment**
+   ```bash
+   cp .env.local.example .env.local
+   # Edit REDIS_URL if needed (defaults to localhost:6379)
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+4. **Start development server**
+   ```bash
+   npm run dev
+   ```
 
-## Deploy on Vercel
+5. **Open application**
+   - Navigate to http://localhost:3000
+   - Create a new job search session
+   - Watch real-time job extraction
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Architecture
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Dashboard**: Overview of active searches and statistics
+- **Search Details**: Real-time viewport streaming and job extraction
+- **Jobs Management**: Saved jobs with application tracking
+- **API Routes**: RESTful endpoints for search and job management
+- **Redis Integration**: Production-ready SSE connection management
+
+## Development
+
+- Built with modern React patterns and TypeScript
+- Real-time updates via Server-Sent Events
+- Responsive design with Tailwind CSS
+- Component library with shadcn/ui
+
+## Production Deployment
+
+- Redis required for SSE connections across serverless environments
+- Compatible with Vercel, AWS Lambda, or containerized deployments
+- Environment variables for Redis and AWS configuration
+
+---
+
+*Generated with Claude Code*
