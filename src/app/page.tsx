@@ -1,40 +1,39 @@
-'use client';
+"use client";
 
-import { useAllSessions } from '@/hooks/use-job-search';
-import { ActiveSearchesList } from '@/components/dashboard/active-searches-list';
-import { Button } from '@/components/ui/button';
-import { PlusIcon, BriefcaseIcon } from 'lucide-react';
-import Link from 'next/link';
-import { useCallback } from 'react';
+import { ActiveSearchesList } from "@/components/dashboard/active-searches-list";
+import { Button } from "@/components/ui/button";
+import { PlusIcon, BriefcaseIcon } from "lucide-react";
+import Link from "next/link";
+import { useCallback } from "react";
+import { useAllSessions } from "@/hooks/use-all-sessions";
 
 export default function DashboardPage() {
   const { sessions, isLoading } = useAllSessions();
 
   const handlePlay = useCallback(async (sessionId: string) => {
     // Resume search
-    await fetch(`/api/search/${sessionId}/resume`, { method: 'POST' });
+    await fetch(`/api/search/${sessionId}/resume`, { method: "POST" });
   }, []);
 
   const handlePause = useCallback(async (sessionId: string) => {
     // Pause search
-    await fetch(`/api/search/${sessionId}/pause`, { method: 'POST' });
+    await fetch(`/api/search/${sessionId}/pause`, { method: "POST" });
   }, []);
 
   const handleStop = useCallback(async (sessionId: string) => {
     // Stop search
-    await fetch(`/api/search/${sessionId}/stop`, { method: 'POST' });
+    await fetch(`/api/search/${sessionId}/stop`, { method: "POST" });
   }, []);
 
   // Get active sessions (running or paused)
   const activeSessions = sessions.filter(
-    (s) => s.status === 'running' || s.status === 'paused'
+    (s) => s.status === "running" || s.status === "paused"
   );
 
   // Get statistics
   const stats = {
     active: activeSessions.length,
     total: sessions.length,
-    jobsFound: sessions.reduce((sum, s) => sum + s.jobsFound, 0),
   };
 
   return (
@@ -42,7 +41,9 @@ export default function DashboardPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Job Search Dashboard</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Job Search Dashboard
+          </h1>
           <p className="text-muted-foreground mt-1">
             Manage your automated job searches
           </p>
@@ -85,7 +86,7 @@ export default function DashboardPage() {
           <div className="flex flex-row items-center justify-between space-y-0 pb-2">
             <h3 className="text-sm font-medium">Jobs Found</h3>
           </div>
-          <div className="text-2xl font-bold">{stats.jobsFound}</div>
+          <div className="text-2xl font-bold">{/* jobs found count */}</div>
           <p className="text-xs text-muted-foreground">Across all searches</p>
         </div>
       </div>

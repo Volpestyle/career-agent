@@ -1,9 +1,15 @@
-'use client';
+"use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { JobSearchSession } from '@/types';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { BrowserSession } from "@wallcrawler/infra-common";
 import {
   PlayIcon,
   PauseIcon,
@@ -11,12 +17,11 @@ import {
   BriefcaseIcon,
   ClockIcon,
   MapPinIcon,
-} from 'lucide-react';
-import Link from 'next/link';
-import { formatDistanceToNow } from '@/lib/utils';
+} from "lucide-react";
+import Link from "next/link";
 
 interface JobSearchCardProps {
-  session: JobSearchSession;
+  session: BrowserSession;
   onPlay?: () => void;
   onPause?: () => void;
   onStop?: () => void;
@@ -28,32 +33,34 @@ export function JobSearchCard({
   onPause,
   onStop,
 }: JobSearchCardProps) {
-  const getStatusColor = () => {
+  const getStatusIcon = () => {
     switch (session.status) {
-      case 'running':
-        return 'bg-green-500';
-      case 'paused':
-        return 'bg-yellow-500';
-      case 'stopped':
-        return 'bg-red-500';
-      case 'completed':
-        return 'bg-blue-500';
+      case "running":
+        return (
+          <div className="animate-pulse h-2 w-2 rounded-full bg-green-500" />
+        );
+      case "paused":
+        return <div className="h-2 w-2 rounded-full bg-yellow-500" />;
+      case "stopped":
+        return <div className="h-2 w-2 rounded-full bg-red-500" />;
+      case "failed":
+        return <div className="h-2 w-2 rounded-full bg-red-500" />;
       default:
-        return 'bg-gray-500';
+        return <div className="h-2 w-2 rounded-full bg-gray-500" />;
     }
   };
 
-  const getStatusIcon = () => {
-    switch (session.status) {
-      case 'running':
-        return <div className="animate-pulse h-2 w-2 rounded-full bg-green-500" />;
-      case 'paused':
-        return <div className="h-2 w-2 rounded-full bg-yellow-500" />;
-      case 'stopped':
-        return <div className="h-2 w-2 rounded-full bg-red-500" />;
-      case 'completed':
-        return <div className="h-2 w-2 rounded-full bg-blue-500" />;
-    }
+  const formatTimeAgo = (date: Date) => {
+    const now = new Date();
+    const diff = now.getTime() - date.getTime();
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+
+    if (days > 0) return `${days}d ago`;
+    if (hours > 0) return `${hours}h ago`;
+    if (minutes > 0) return `${minutes}m ago`;
+    return "Just now";
   };
 
   return (
@@ -63,11 +70,11 @@ export function JobSearchCard({
           <div className="flex-1">
             <CardTitle className="text-lg flex items-center gap-2">
               <BriefcaseIcon className="h-5 w-5" />
-              {session.searchParams.keywords.join(', ')}
+              Session {session.id.split("_")[1]}
             </CardTitle>
             <CardDescription className="mt-1 flex items-center gap-2">
               <MapPinIcon className="h-4 w-4" />
-              {session.searchParams.location}
+              Task ID: {session.taskId}
             </CardDescription>
           </div>
           <div className="flex items-center gap-2">
@@ -80,26 +87,15 @@ export function JobSearchCard({
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
-          <div className="flex flex-wrap gap-2">
-            <Badge variant="secondary">
-              {session.searchParams.jobType === 'any' ? 'All Types' : session.searchParams.jobType}
-            </Badge>
-            {session.searchParams.experienceLevel.map((level) => (
-              <Badge key={level} variant="secondary" className="capitalize">
-                {level}
-              </Badge>
-            ))}
-          </div>
-
           <div className="flex items-center justify-between text-sm text-muted-foreground">
             <div className="flex items-center gap-4">
               <span className="flex items-center gap-1">
                 <BriefcaseIcon className="h-4 w-4" />
-                {session.jobsFound} jobs found
+                {session.itemsProcessed} jobs found
               </span>
               <span className="flex items-center gap-1">
                 <ClockIcon className="h-4 w-4" />
-                {formatDistanceToNow(new Date(session.startedAt))}
+                {formatTimeAgo(session.startedAt)}
               </span>
             </div>
           </div>
@@ -110,8 +106,8 @@ export function JobSearchCard({
                 View Details
               </Button>
             </Link>
-            
-            {session.status === 'running' && (
+
+            {session.status === "running" && (
               <Button
                 size="icon"
                 variant="outline"
@@ -121,8 +117,8 @@ export function JobSearchCard({
                 <PauseIcon className="h-4 w-4" />
               </Button>
             )}
-            
-            {session.status === 'paused' && (
+
+            {session.status === "paused" && (
               <Button
                 size="icon"
                 variant="outline"
@@ -132,8 +128,8 @@ export function JobSearchCard({
                 <PlayIcon className="h-4 w-4" />
               </Button>
             )}
-            
-            {(session.status === 'running' || session.status === 'paused') && (
+
+            {(session.status === "running" || session.status === "paused") && (
               <Button
                 size="icon"
                 variant="outline"

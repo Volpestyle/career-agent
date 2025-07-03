@@ -19,7 +19,7 @@ interface ViewportContainerProps {
 
 export function ViewportContainer({
   viewportUrl,
-  sessionId,
+  sessionId: _sessionId,
   isConnected = false,
 }: ViewportContainerProps) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -36,7 +36,8 @@ export function ViewportContainer({
 
   const handleRefresh = () => {
     if (iframeRef.current) {
-      iframeRef.current.src = iframeRef.current.src;
+      const currentSrc = iframeRef.current.src;
+      iframeRef.current.src = currentSrc;
       setIsLoading(true);
     }
   };

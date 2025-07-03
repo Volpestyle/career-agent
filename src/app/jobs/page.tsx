@@ -14,7 +14,6 @@ import { Job } from '@/types';
 export default function SavedJobsPage() {
   const {
     jobs,
-    isLoading,
     applyToJob,
     updateJobStatus,
     deleteJob,
@@ -23,7 +22,6 @@ export default function SavedJobsPage() {
 
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [isJobModalOpen, setIsJobModalOpen] = useState(false);
-  const [isApplying, setIsApplying] = useState(false);
 
   const handleViewJobDetails = (job: Job) => {
     setSelectedJob(job);

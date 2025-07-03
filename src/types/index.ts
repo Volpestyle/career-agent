@@ -1,19 +1,17 @@
-export interface JobSearchSession {
+import { BrowserSession } from "@wallcrawler/infra-common";
+
+// Persistent job search configuration (stored in DynamoDB)
+export interface JobSearchParams {
   id: string;
-  searchParams: JobSearchParams;
-  status: 'running' | 'paused' | 'stopped' | 'completed';
-  startedAt: Date;
+  status: "idle" | "running" | "paused" | "stopped" | "completed";
+  createdAt: Date;
   updatedAt: Date;
   jobsFound: number;
-  sessionId: string; // Stagehand session ID
-  viewportUrl?: string; // For streaming the browser view
-}
-
-export interface JobSearchParams {
+  // Search parameters
   keywords: string[];
   location: string;
-  jobType: 'remote' | 'onsite' | 'hybrid' | 'any';
-  experienceLevel: ('entry' | 'mid' | 'senior' | 'executive')[];
+  jobType: "remote" | "onsite" | "hybrid" | "any";
+  experienceLevel: ("entry" | "mid" | "senior" | "executive")[];
   salary?: {
     min: number;
     max: number;
@@ -23,7 +21,7 @@ export interface JobSearchParams {
 }
 
 export interface JobPlatform {
-  name: 'linkedin' | 'indeed' | 'glassdoor' | 'angellist' | 'dice' | 'monster';
+  name: string;
   enabled: boolean;
   searchUrl?: string;
 }
@@ -33,7 +31,7 @@ export interface Job {
   title: string;
   company: string;
   location: string;
-  jobType: 'remote' | 'onsite' | 'hybrid';
+  jobType: "remote" | "onsite" | "hybrid";
   salary?: string;
   description: string;
   requirements?: string[];
@@ -44,18 +42,18 @@ export interface Job {
   savedAt?: Date;
   appliedAt?: Date;
   applicationStatus?: ApplicationStatus;
-  applicationMethod?: 'manual' | 'automated';
-  searchSessionId: string;
+  applicationMethod?: "manual" | "automated";
+  sessionId: string;
 }
 
 export interface ApplicationStatus {
-  status: 'pending' | 'applied' | 'rejected' | 'interview' | 'offer';
+  status: "pending" | "applied" | "rejected" | "interview" | "offer";
   notes?: string;
   updatedAt: Date;
 }
 
 export interface ViewportControl {
-  action: 'play' | 'pause' | 'stop';
+  action: "play" | "pause" | "stop";
   timestamp: Date;
 }
 
@@ -67,14 +65,81 @@ export interface JobExtractionEvent {
 
 export interface SearchStatusEvent {
   sessionId: string;
-  status: JobSearchSession['status'];
+  status: JobSearchParams["status"];
   message?: string;
   timestamp: Date;
 }
 
+// AutomationTask is now part of BrowserSession - no separate interface needed
+
 export interface StagehandConfig {
-  provider: 'local' | 'aws';
+  provider: "local" | "aws";
   apiKey?: string;
   model?: string;
   headless?: boolean;
 }
+
+// Redis Event System
+export interface BaseEvent {
+  type: string;
+  timestamp: string;
+  sessionId?: string;
+}
+
+export interface JobsExtractedEvent extends BaseEvent {
+  type: "jobs_extracted";
+  data: {
+    jobs: Job[];
+    totalJobsFound: number;
+  };
+}
+
+export interface SessionUpdatedEvent extends BaseEvent {
+  type: "session_updated";
+  data: {
+    session: BrowserSession;
+  };
+}
+
+export interface JobSearchUpdatedEvent extends BaseEvent {
+  type: "job_search_updated";
+  data: {
+    jobSearchParams: JobSearchParams;
+  };
+}
+
+export interface AutomationStatusEvent extends BaseEvent {
+  type: "automation_status";
+  data: {
+    status: "starting" | "running" | "stopping" | "stopped" | "failed";
+    message?: string;
+    taskArn?: string;
+  };
+}
+
+export interface VncConnectionEvent extends BaseEvent {
+  type: "vnc_connection";
+  data: {
+    status: "connected" | "disconnected" | "error";
+    connectionId?: string;
+    vncUrl?: string;
+  };
+}
+
+export interface ErrorEvent extends BaseEvent {
+  type: "error";
+  data: {
+    error: string;
+    details?: string;
+    component?: string;
+  };
+}
+
+// Union type for all possible events
+export type RedisEvent =
+  | JobsExtractedEvent
+  | SessionUpdatedEvent
+  | JobSearchUpdatedEvent
+  | AutomationStatusEvent
+  | VncConnectionEvent
+  | ErrorEvent;

@@ -1,127 +1,101 @@
-import { useState, useEffect, useCallback } from 'react';
-import { Job, ApplicationStatus } from '@/types';
-import { jobStorage } from '@/lib/job-storage';
+import { useState, useEffect, useCallback } from "react";
+import { Job, ApplicationStatus } from "@/types";
+import { jobSearchStorage } from "@/lib/job-search-storage";
 
 export function useSavedJobs() {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Load saved jobs
   useEffect(() => {
-    setJobs(jobStorage.getSavedJobs());
-    setIsLoading(false);
-  }, []);
-
-  // Apply to a job
-  const applyToJob = useCallback(
-    async (jobId: string, method: 'manual' | 'automated') => {
-      setIsLoading(true);
+    // Load all saved jobs from storage
+    const loadSavedJobs = async () => {
       try {
-        const response = await fetch(`/api/jobs/${jobId}/apply`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ method }),
-        });
-
-        if (response.ok) {
-          const updatedJob = await response.json();
-          
-          // Update local state
-          const applicationStatus: ApplicationStatus = {
-            status: 'applied',
-            updatedAt: new Date(),
-          };
-          
-          jobStorage.updateJobApplication(jobId, applicationStatus, method);
-          setJobs((prev) =>
-            prev.map((job) => (job.id === jobId ? updatedJob : job))
-          );
-        }
+        const savedJobs = await jobSearchStorage.getSavedJobs();
+        setJobs(savedJobs);
       } catch (error) {
-        console.error('Error applying to job:', error);
+        console.error("Error loading saved jobs:", error);
       } finally {
         setIsLoading(false);
       }
-    },
-    []
-  );
+    };
+    loadSavedJobs();
+  }, []);
 
-  // Update job status
-  const updateJobStatus = useCallback(
-    (jobId: string, status: ApplicationStatus) => {
-      const updatedJob = jobStorage.updateJobApplication(
-        jobId,
-        status,
-        'manual'
-      );
+  const applyToJob = useCallback(async (job: Job, method: "manual" | "automated") => {
+    try {
+      const status: ApplicationStatus = {
+        status: "applied",
+        updatedAt: new Date(),
+        notes: `Applied via ${method} method`,
+      };
+      
+      const updatedJob = await jobSearchStorage.updateJobApplication(job.id, status, method);
+      if (updatedJob) {
+        setJobs((prev) => 
+          prev.map((j) => j.id === job.id ? updatedJob : j)
+        );
+      }
+      
+      return updatedJob;
+    } catch (error) {
+      console.error("Error applying to job:", error);
+      throw error;
+    }
+  }, []);
+
+  const updateJobStatus = useCallback(async (jobId: string, status: ApplicationStatus) => {
+    try {
+      const updatedJob = await jobSearchStorage.updateJob(jobId, {
+        applicationStatus: status,
+      });
       
       if (updatedJob) {
-        setJobs((prev) =>
-          prev.map((job) => (job.id === jobId ? updatedJob : job))
+        setJobs((prev) => 
+          prev.map((j) => j.id === jobId ? updatedJob : j)
         );
       }
-    },
-    []
-  );
-
-  // Delete a saved job
-  const deleteJob = useCallback((jobId: string) => {
-    jobStorage.deleteJob(jobId);
-    setJobs((prev) => prev.filter((job) => job.id !== jobId));
-  }, []);
-
-  // Filter jobs
-  const filterJobs = useCallback(
-    (filters: {
-      platform?: string;
-      applicationStatus?: ApplicationStatus['status'];
-      jobType?: Job['jobType'];
-    }) => {
-      let filtered = jobStorage.getSavedJobs();
-
-      if (filters.platform) {
-        filtered = filtered.filter((job) => job.platform === filters.platform);
-      }
-
-      if (filters.applicationStatus) {
-        filtered = filtered.filter(
-          (job) => job.applicationStatus?.status === filters.applicationStatus
-        );
-      }
-
-      if (filters.jobType) {
-        filtered = filtered.filter((job) => job.jobType === filters.jobType);
-      }
-
-      setJobs(filtered);
-    },
-    []
-  );
-
-  // Search jobs
-  const searchJobs = useCallback((query: string) => {
-    if (!query.trim()) {
-      setJobs(jobStorage.getSavedJobs());
-      return;
+      
+      return updatedJob;
+    } catch (error) {
+      console.error("Error updating job status:", error);
+      throw error;
     }
-    
-    const results = jobStorage.searchJobs(query);
-    setJobs(results.filter((job) => job.savedAt));
   }, []);
 
-  // Get statistics
-  const getStats = useCallback(() => {
-    const stats = jobStorage.getStats();
-    return {
-      total: jobs.length,
-      applied: jobs.filter((job) => job.appliedAt).length,
-      pending: jobs.filter((job) => !job.appliedAt).length,
-      byPlatform: jobs.reduce((acc, job) => {
-        acc[job.platform] = (acc[job.platform] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>),
-    };
-  }, [jobs]);
+  const deleteJob = useCallback(async (jobId: string) => {
+    try {
+      const success = await jobSearchStorage.deleteJob(jobId);
+      if (success) {
+        setJobs((prev) => prev.filter((j) => j.id !== jobId));
+      }
+      return success;
+    } catch (error) {
+      console.error("Error deleting job:", error);
+      throw error;
+    }
+  }, []);
+
+  const refreshJobs = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const savedJobs = await jobSearchStorage.getSavedJobs();
+      setJobs(savedJobs);
+    } catch (error) {
+      console.error("Error refreshing jobs:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const searchJobs = useCallback(async (query: string) => {
+    try {
+      const searchResults = await jobSearchStorage.searchJobs(query);
+      return searchResults;
+    } catch (error) {
+      console.error("Error searching jobs:", error);
+      return [];
+    }
+  }, []);
 
   return {
     jobs,
@@ -129,8 +103,7 @@ export function useSavedJobs() {
     applyToJob,
     updateJobStatus,
     deleteJob,
-    filterJobs,
+    refreshJobs,
     searchJobs,
-    stats: getStats(),
   };
 }

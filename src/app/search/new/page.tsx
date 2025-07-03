@@ -15,7 +15,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
-import { useAllSessions } from '@/hooks/use-job-search';
+import { useAllSessions } from '@/hooks/use-all-sessions';
 import { JobSearchParams, JobPlatform } from '@/types';
 import { ArrowLeftIcon, XIcon } from 'lucide-react';
 import Link from 'next/link';
@@ -178,7 +178,7 @@ export default function NewSearchPage() {
             </div>
             <div>
               <Label htmlFor="jobType">Job Type</Label>
-              <Select value={jobType} onValueChange={(value: any) => setJobType(value)}>
+              <Select value={jobType} onValueChange={(value: string) => setJobType(value as "remote" | "onsite" | "hybrid" | "any")}>
                 <SelectTrigger id="jobType">
                   <SelectValue />
                 </SelectTrigger>
@@ -206,7 +206,7 @@ export default function NewSearchPage() {
                   type="button"
                   onClick={() => toggleExperienceLevel(level)}
                   className={`px-4 py-2 rounded-md border capitalize transition-colors ${
-                    experienceLevel.includes(level as any)
+                    experienceLevel.includes(level as "entry" | "mid" | "senior" | "executive")
                       ? 'bg-primary text-primary-foreground border-primary'
                       : 'bg-background hover:bg-accent'
                   }`}

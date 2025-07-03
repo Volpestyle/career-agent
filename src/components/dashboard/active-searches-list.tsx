@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { JobSearchSession } from '@/types';
-import { JobSearchCard } from './job-search-card';
-import { Skeleton } from '@/components/ui/skeleton';
+import { BrowserSession } from "@wallcrawler/infra-common";
+import { JobSearchCard } from "./job-search-card";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface ActiveSearchesListProps {
-  sessions: JobSearchSession[];
+  sessions: BrowserSession[];
   isLoading: boolean;
   onPlay?: (sessionId: string) => void;
   onPause?: (sessionId: string) => void;
