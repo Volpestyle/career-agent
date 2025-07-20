@@ -1,0 +1,86 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: 240 10% 3.9%;
+  --color-foreground: 0 0% 98%;
+  --color-card: 240 10% 6%;
+  --color-card-foreground: 0 0% 98%;
+  --color-popover: 240 10% 3.9%;
+  --color-popover-foreground: 0 0% 98%;
+  --color-primary: 47 96% 53%;
+  --color-primary-foreground: 240 10% 3.9%;
+  --color-secondary: 240 3.7% 15.9%;
+  --color-secondary-foreground: 0 0% 98%;
+  --color-muted: 240 3.7% 12%;
+  --color-muted-foreground: 240 5% 64.9%;
+  --color-accent: 240 3.7% 15.9%;
+  --color-accent-foreground: 0 0% 98%;
+  --color-destructive: 0 62.8% 30.6%;
+  --color-destructive-foreground: 0 0% 98%;
+  --color-border: 240 3.7% 15.9%;
+  --color-input: 240 3.7% 15.9%;
+  --color-ring: 47 96% 53%;
+  --radius: 0.5rem;
+
+  /* Font families */
+  --font-family-heading: var(--font-heading), ui-sans-serif, system-ui,
+    sans-serif;
+  --font-family-subheading: var(--font-subheading), ui-serif, Georgia, serif;
+  --font-family-body: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Ensure dark theme */
+html.dark,
+html.dark body {
+  background-color: hsl(240 10% 3.9%);
+  color: hsl(0 0% 98%);
+}
+
+/* Font utility classes */
+.font-heading {
+  font-family: var(--font-family-heading);
+}
+
+.font-subheading {
+  font-family: var(--font-family-subheading);
+}
+
+.font-body {
+  font-family: var(--font-family-body);
+}
+
+/* Custom button styles - outline with yellow accent */
+.btn-primary {
+  background: transparent;
+  border: 1px solid hsl(47 96% 53%);
+  color: hsl(47 96% 53%);
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-primary:hover {
+  background: hsl(47 96% 53% / 0.1);
+  border-color: hsl(47 96% 60%);
+  color: hsl(47 96% 60%);
+}
+
+.btn-secondary {
+  background: transparent;
+  border: 1px solid hsl(240 3.7% 15.9%);
+  color: hsl(0 0% 98%);
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-secondary:hover {
+  background: hsl(240 3.7% 15.9%);
+  border-color: hsl(240 3.7% 25%);
+}
+
+/* Custom component styles */
+.card-hover {
+  transition: all 0.2s ease-in-out;
+}
+
+.card-hover:hover {
+  border-color: hsl(47 96% 53% / 0.3);
+  box-shadow: 0 4px 12px hsl(47 96% 53% / 0.1);
+}

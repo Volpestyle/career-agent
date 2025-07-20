@@ -1,2 +1,0 @@
-overrides:
-  '@wallcrawler/infra-common': link:../wallcrawler/packages/infra/common
