@@ -1,0 +1,7 @@
+{
+  "environment": "dev",
+  "branchName": "develop",
+  "domainName": "",
+  "githubTokenSecretName": "jobseek/github-token",
+  "wallcrawlerApiKeySecretName": "jobseek/wallcrawler-api-key"
+}

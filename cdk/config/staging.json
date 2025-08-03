@@ -1,0 +1,7 @@
+{
+  "environment": "staging",
+  "branchName": "staging",
+  "domainName": "staging.jobseek.com",
+  "githubTokenSecretName": "jobseek/github-token",
+  "wallcrawlerApiKeySecretName": "jobseek/wallcrawler-api-key"
+}

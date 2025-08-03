@@ -1,0 +1,9 @@
+{
+  "environment": "prod",
+  "branchName": "main",
+  "domainName": "jobseek.com",
+  "githubTokenSecretName": "jobseek/github-token",
+  "wallcrawlerApiKeySecretName": "jobseek/wallcrawler-api-key",
+  "enableBackups": true,
+  "enableDetailedMonitoring": true
+}

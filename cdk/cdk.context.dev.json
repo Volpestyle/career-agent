@@ -1,0 +1,8 @@
+{
+  "environment": "dev",
+  "googleClientId": "1077183618076-c8bhm1ugee1jj26ibvlird1c1qj0k3lb.apps.googleusercontent.com",
+  "googleClientSecret": "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",
+  "twitterClientId": "RXREajdvUk1WUTQ0YlpqMVg2X1A6MTpjaQ",
+  "twitterClientSecret": "6IWwB48z2PLwg_1uS4H_dXbiIVAWsBmplL30pIMrNN2xXmSEyA",
+  "nextAuthSecret": "acE0jM4ovxcR93pJXrJu9KL8TLkVyJbR8hoqrHQb7DU="
+}
