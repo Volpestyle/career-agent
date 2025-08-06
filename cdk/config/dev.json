@@ -1,7 +1,10 @@
 {
   "environment": "dev",
-  "branchName": "develop",
+  "branchName": "main",
   "domainName": "",
   "githubTokenSecretName": "jobseek/github-token",
-  "wallcrawlerApiKeySecretName": "jobseek/wallcrawler-api-key"
+  "wallcrawlerApiKeySecretName": "jobseek/wallcrawler-api-key",
+  "awsRegion": "us-east-1",
+  "enableBackups": false,
+  "enableDetailedMonitoring": false
 }

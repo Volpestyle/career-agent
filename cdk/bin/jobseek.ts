@@ -50,6 +50,10 @@ const amplifyStack = new AmplifyStack(app, `JobseekAmplify-${environment}`, {
   environment,
   config,
   tags,
+  backendOutputs: {
+    userTableName: backendStack.usersTable.tableName,
+    resumeBucketName: backendStack.resumeBucket.bucketName,
+  },
   envVars: Object.values(envVars).some(v => v) ? envVars : undefined,
 });
 

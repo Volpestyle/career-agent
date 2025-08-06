@@ -52,7 +52,16 @@ async function createOrUpdateSecret(client: SecretsManagerClient, secretName: st
 
 async function main() {
   const environment = process.argv[2] || 'dev';
-  const envFile = process.argv[3] || `.env.deploy.${environment}`;
+  // Map environment names to .env file names
+  const envFileMap: Record<string, string> = {
+    'dev': '.env.local',
+    'development': '.env.local',
+    'local': '.env.local',
+    'staging': '.env.staging',
+    'prod': '.env.prod',
+    'production': '.env.prod'
+  };
+  const envFile = process.argv[3] || envFileMap[environment] || `.env.${environment}`;
   
   console.log(`🚀 Deploying secrets for environment: ${environment}`);
   console.log(`📄 Reading from: ${envFile}`);
@@ -61,8 +70,8 @@ async function main() {
   const envPath = path.resolve(process.cwd(), envFile);
   if (!fs.existsSync(envPath)) {
     console.error(`❌ Environment file not found: ${envPath}`);
-    console.log('\nCreate a file based on .env.deploy.example:');
-    console.log(`cp .env.deploy.example ${envFile}`);
+    console.log('\nCreate a file based on .env.example:');
+    console.log(`cp .env.example ${envFile}`);
     process.exit(1);
   }
   

@@ -1,7 +1,11 @@
 {
   "environment": "staging",
   "branchName": "staging",
-  "domainName": "staging.jobseek.com",
+  "domainName": "",
   "githubTokenSecretName": "jobseek/github-token",
-  "wallcrawlerApiKeySecretName": "jobseek/wallcrawler-api-key"
+  "wallcrawlerApiKeySecretName": "jobseek/wallcrawler-api-key",
+  "awsRegion": "us-east-1",
+  "enableBackups": false,
+  "enableDetailedMonitoring": false,
+  "alarmEmail": ""
 }

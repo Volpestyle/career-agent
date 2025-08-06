@@ -92,11 +92,26 @@ echo -e "${GREEN}✅ All prerequisites met${NC}"
 echo ""
 
 # Check for environment file
-ENV_FILE=".env.deploy.$ENVIRONMENT"
+# Map environment names to .env file names
+case "$ENVIRONMENT" in
+    dev|development|local)
+        ENV_FILE=".env.local"
+        ;;
+    staging)
+        ENV_FILE=".env.staging"
+        ;;
+    prod|production)
+        ENV_FILE=".env.prod"
+        ;;
+    *)
+        ENV_FILE=".env.$ENVIRONMENT"
+        ;;
+esac
+
 if [[ ! -f "$ENV_FILE" ]]; then
     echo -e "${RED}❌ Environment file not found: $ENV_FILE${NC}"
     echo -e "${YELLOW}Creating from template...${NC}"
-    cp .env.deploy.example "$ENV_FILE"
+    cp .env.example "$ENV_FILE"
     echo -e "${YELLOW}⚠️  Please edit $ENV_FILE with your values and run again${NC}"
     exit 1
 fi

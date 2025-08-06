@@ -78,7 +78,7 @@ export class BackendStack extends cdk.Stack {
           ],
           allowedOrigins: props.config.domainName
             ? [`https://${props.config.domainName}`, 'http://localhost:3000']
-            : ['http://localhost:3000'],
+            : ['http://localhost:3000', `https://${props.config.branchName || 'main'}.*.amplifyapp.com`],
           allowedHeaders: ['*'],
           exposedHeaders: ['ETag'],
           maxAge: 3000,
@@ -159,11 +159,25 @@ export class BackendStack extends cdk.Stack {
     new cdk.CfnOutput(this, 'UsersTableName', {
       value: this.usersTable.tableName,
       exportName: `jobseek-users-table-${props.environment}`,
+      description: 'DynamoDB table name for user data',
     });
 
     new cdk.CfnOutput(this, 'ResumeBucketName', {
       value: this.resumeBucket.bucketName,
       exportName: `jobseek-resume-bucket-${props.environment}`,
+      description: 'S3 bucket name for resume storage',
+    });
+
+    new cdk.CfnOutput(this, 'UsersTableArn', {
+      value: this.usersTable.tableArn,
+      exportName: `jobseek-users-table-arn-${props.environment}`,
+      description: 'DynamoDB table ARN',
+    });
+
+    new cdk.CfnOutput(this, 'ResumeBucketArn', {
+      value: this.resumeBucket.bucketArn,
+      exportName: `jobseek-resume-bucket-arn-${props.environment}`,
+      description: 'S3 bucket ARN',
     });
   }
 }

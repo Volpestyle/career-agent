@@ -6,6 +6,10 @@ import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
 export interface AmplifyStackProps extends cdk.StackProps {
   environment: string;
   config: any;
+  backendOutputs?: {
+    userTableName?: string;
+    resumeBucketName?: string;
+  };
   envVars?: {
     googleClientId?: string;
     googleClientSecret?: string;
@@ -39,6 +43,10 @@ export class AmplifyStack extends cdk.Stack {
         { name: 'TWITTER_CLIENT_ID', value: props.envVars?.twitterClientId || '{{TWITTER_CLIENT_ID}}' },
         { name: 'TWITTER_CLIENT_SECRET', value: props.envVars?.twitterClientSecret || '{{TWITTER_CLIENT_SECRET}}' },
         { name: 'NEXTAUTH_SECRET', value: props.envVars?.nextAuthSecret || '{{NEXTAUTH_SECRET}}' },
+        { name: 'AWS_REGION', value: props.config.awsRegion || 'us-east-1' },
+        { name: 'DYNAMODB_TABLE_NAME', value: props.backendOutputs?.userTableName || `jobseek-users-${props.environment}` },
+        { name: 'S3_RESUME_BUCKET', value: props.backendOutputs?.resumeBucketName || '' },
+        { name: 'NODE_ENV', value: props.environment === 'prod' ? 'production' : 'development' },
       ],
       customRules: [
         {
@@ -57,10 +65,11 @@ frontend:
   phases:
     preBuild:
       commands:
-        - npm install
+        - npm install -g pnpm
+        - pnpm install --frozen-lockfile
     build:
       commands:
-        - npm run build
+        - pnpm run build
   artifacts:
     baseDirectory: .next
     files:
@@ -68,6 +77,7 @@ frontend:
   cache:
     paths:
       - node_modules/**/*
+      - .pnpm-store/**/*
       - .next/cache/**/*`,
     });
 
