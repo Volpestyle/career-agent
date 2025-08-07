@@ -1,0 +1,5 @@
+{
+  "@wallcrawler/sdk": "^1.0.0",
+  "@wallcrawler/components": "^1.0.0",
+  "@wallcrawler/stagehand": "^1.0.0"
+}

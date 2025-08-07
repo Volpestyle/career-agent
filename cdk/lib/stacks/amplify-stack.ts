@@ -66,6 +66,17 @@ frontend:
     preBuild:
       commands:
         - npm install -g pnpm
+        # Replace local link/file paths with npm versions for production
+        - |
+          echo "Replacing local dependencies with npm versions..."
+          cp package.json package.json.backup
+          sed -i 's|"link:../wallcrawler/packages/sdk-node"|"^1.0.0"|' package.json
+          sed -i 's|"link:../wallcrawler/packages/components"|"^1.0.0"|' package.json
+          sed -i 's|"link:../wallcrawler/packages/stagehand"|"^1.0.0"|' package.json
+          sed -i 's|"file:../wallcrawler/packages/sdk-node"|"^1.0.0"|' package.json
+          sed -i 's|"file:../wallcrawler/packages/components"|"^1.0.0"|' package.json
+          sed -i 's|"file:../wallcrawler/packages/stagehand"|"^1.0.0"|' package.json
+          echo "Dependencies replaced successfully"
         - pnpm install --frozen-lockfile
     build:
       commands:
