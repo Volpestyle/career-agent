@@ -1,7 +1,7 @@
-import * as cdk from 'aws-cdk-lib';
-import { Construct } from 'constructs';
-import * as amplify from 'aws-cdk-lib/aws-amplify';
-import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
+import * as cdk from "aws-cdk-lib";
+import { Construct } from "constructs";
+import * as amplify from "aws-cdk-lib/aws-amplify";
+import * as secretsmanager from "aws-cdk-lib/aws-secretsmanager";
 
 export interface AmplifyStackProps extends cdk.StackProps {
   environment: string;
@@ -27,37 +27,68 @@ export class AmplifyStack extends cdk.Stack {
 
     const githubTokenSecret = secretsmanager.Secret.fromSecretNameV2(
       this,
-      'GitHubToken',
+      "GitHubToken",
       props.config.githubTokenSecretName
     );
 
-    this.amplifyApp = new amplify.CfnApp(this, 'JobseekApp', {
+    this.amplifyApp = new amplify.CfnApp(this, "JobseekApp", {
       name: `jobseek-${props.environment}`,
-      repository: 'https://github.com/Volpestyle/jobseek',
-      oauthToken: githubTokenSecret.secretValueFromJson('token').unsafeUnwrap(),
+      repository: "https://github.com/Volpestyle/jobseek",
+      oauthToken: githubTokenSecret.secretValueFromJson("token").unsafeUnwrap(),
       environmentVariables: [
-        { name: 'AMPLIFY_MONOREPO_APP_ROOT', value: '.' },
-        { name: '_LIVE_UPDATES', value: '[{"pkg":"next","type":"npm","version":"latest"}]' },
-        { name: 'GOOGLE_CLIENT_ID', value: props.envVars?.googleClientId || '{{GOOGLE_CLIENT_ID}}' },
-        { name: 'GOOGLE_CLIENT_SECRET', value: props.envVars?.googleClientSecret || '{{GOOGLE_CLIENT_SECRET}}' },
-        { name: 'TWITTER_CLIENT_ID', value: props.envVars?.twitterClientId || '{{TWITTER_CLIENT_ID}}' },
-        { name: 'TWITTER_CLIENT_SECRET', value: props.envVars?.twitterClientSecret || '{{TWITTER_CLIENT_SECRET}}' },
-        { name: 'NEXTAUTH_SECRET', value: props.envVars?.nextAuthSecret || '{{NEXTAUTH_SECRET}}' },
-        { name: 'AWS_REGION', value: props.config.awsRegion || 'us-east-1' },
-        { name: 'DYNAMODB_TABLE_NAME', value: props.backendOutputs?.userTableName || `jobseek-users-${props.environment}` },
-        { name: 'S3_RESUME_BUCKET', value: props.backendOutputs?.resumeBucketName || '' },
-        { name: 'NODE_ENV', value: props.environment === 'prod' ? 'production' : 'development' },
+        { name: "AMPLIFY_MONOREPO_APP_ROOT", value: "." },
+        {
+          name: "_LIVE_UPDATES",
+          value: '[{"pkg":"next","type":"npm","version":"latest"}]',
+        },
+        {
+          name: "GOOGLE_CLIENT_ID",
+          value: props.envVars?.googleClientId || "{{GOOGLE_CLIENT_ID}}",
+        },
+        {
+          name: "GOOGLE_CLIENT_SECRET",
+          value:
+            props.envVars?.googleClientSecret || "{{GOOGLE_CLIENT_SECRET}}",
+        },
+        {
+          name: "TWITTER_CLIENT_ID",
+          value: props.envVars?.twitterClientId || "{{TWITTER_CLIENT_ID}}",
+        },
+        {
+          name: "TWITTER_CLIENT_SECRET",
+          value:
+            props.envVars?.twitterClientSecret || "{{TWITTER_CLIENT_SECRET}}",
+        },
+        {
+          name: "NEXTAUTH_SECRET",
+          value: props.envVars?.nextAuthSecret || "{{NEXTAUTH_SECRET}}",
+        },
+        { name: "AWS_REGION", value: props.config.awsRegion || "us-east-1" },
+        {
+          name: "DYNAMODB_TABLE_NAME",
+          value:
+            props.backendOutputs?.userTableName ||
+            `jobseek-users-${props.environment}`,
+        },
+        {
+          name: "S3_RESUME_BUCKET",
+          value: props.backendOutputs?.resumeBucketName || "",
+        },
+        {
+          name: "NODE_ENV",
+          value: props.environment === "prod" ? "production" : "development",
+        },
       ],
       customRules: [
         {
-          source: '/api/<*>',
-          target: '/api/<*>',
-          status: '200',
+          source: "/api/<*>",
+          target: "/api/<*>",
+          status: "200",
         },
         {
-          source: '/<*>',
-          target: '/<*>',
-          status: '200',
+          source: "/<*>",
+          target: "/<*>",
+          status: "200",
         },
       ],
       buildSpec: `version: 1
@@ -92,46 +123,46 @@ frontend:
       - .next/cache/**/*`,
     });
 
-    const branch = new amplify.CfnBranch(this, 'MainBranch', {
+    const branch = new amplify.CfnBranch(this, "MainBranch", {
       appId: this.amplifyApp.attrAppId,
-      branchName: props.config.branchName || 'main',
-      stage: props.environment === 'prod' ? 'PRODUCTION' : 'DEVELOPMENT',
+      branchName: props.config.branchName || "main",
+      stage: props.environment === "prod" ? "PRODUCTION" : "DEVELOPMENT",
       environmentVariables: [
-        { name: 'NEXT_PUBLIC_APP_ENV', value: props.environment },
+        { name: "NEXT_PUBLIC_APP_ENV", value: props.environment },
         {
-          name: 'NEXTAUTH_URL',
+          name: "NEXTAUTH_URL",
           value: props.config.domainName
             ? `https://${props.config.domainName}`
-            : `https://${props.config.branchName}.${this.amplifyApp.attrDefaultDomain}`
+            : `https://${props.config.branchName}.${this.amplifyApp.attrDefaultDomain}`,
         },
       ],
       enableAutoBuild: true,
-      enablePerformanceMode: props.environment === 'prod',
-      enablePullRequestPreview: props.environment !== 'prod',
-      pullRequestEnvironmentName: 'pr',
+      enablePerformanceMode: props.environment === "prod",
+      enablePullRequestPreview: props.environment !== "prod",
+      pullRequestEnvironmentName: "pr",
     });
 
     if (props.config.domainName) {
-      new amplify.CfnDomain(this, 'Domain', {
+      new amplify.CfnDomain(this, "Domain", {
         appId: this.amplifyApp.attrAppId,
         domainName: props.config.domainName,
         subDomainSettings: [
           {
             branchName: branch.branchName,
-            prefix: props.environment === 'prod' ? '' : props.environment,
+            prefix: props.environment === "prod" ? "" : props.environment,
           },
         ],
       });
     }
 
-    new cdk.CfnOutput(this, 'AmplifyAppId', {
+    new cdk.CfnOutput(this, "AmplifyAppId", {
       value: this.amplifyApp.attrAppId,
-      description: 'Amplify App ID',
+      description: "Amplify App ID",
     });
 
-    new cdk.CfnOutput(this, 'AmplifyDefaultDomain', {
+    new cdk.CfnOutput(this, "AmplifyDefaultDomain", {
       value: `https://${props.config.branchName}.${this.amplifyApp.attrDefaultDomain}`,
-      description: 'Amplify Default Domain',
+      description: "Amplify Default Domain",
     });
   }
 }
