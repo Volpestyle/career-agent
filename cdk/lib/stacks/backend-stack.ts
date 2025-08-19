@@ -66,6 +66,20 @@ export class BackendStack extends cdk.Stack {
       sortKey: { name: "createdAt", type: dynamodb.AttributeType.STRING },
     });
 
+    // GSI for anonymous user queries
+    this.usersTable.addGlobalSecondaryIndex({
+      indexName: "AnonymousSessionIndex",
+      partitionKey: { name: "anonymousId", type: dynamodb.AttributeType.STRING },
+      sortKey: { name: "searchId", type: dynamodb.AttributeType.STRING },
+    });
+
+    // GSI for querying all results by master search ID
+    this.usersTable.addGlobalSecondaryIndex({
+      indexName: "SearchIdIndex",
+      partitionKey: { name: "searchId", type: dynamodb.AttributeType.STRING },
+      sortKey: { name: "boardName", type: dynamodb.AttributeType.STRING },
+    });
+
     this.resumeBucket = new s3.Bucket(this, "ResumeBucket", {
       bucketName: `jobseek-resumes-${props.environment}-${this.account}`,
       encryption: s3.BucketEncryption.S3_MANAGED,
